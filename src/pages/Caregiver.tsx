@@ -1,10 +1,34 @@
-import { Link } from "react-router-dom";
-import { Map, Heart, Users, Bell, Settings, Activity } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Map, Heart, Users, Bell, Settings, Activity, LogOut } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from "react";
 
 const Caregiver = () => {
+  const navigate = useNavigate();
+  const { user, loading, signOut } = useAuth();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate("/auth");
+    }
+  }, [user, loading, navigate]);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/auth");
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-xl text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
+
   const recentAlerts = [
     { id: 1, type: "info", message: "Morning walk completed successfully", time: "2 hours ago" },
     { id: 2, type: "warning", message: "Slight route deviation detected", time: "Yesterday" },
@@ -29,14 +53,17 @@ const Caregiver = () => {
               <p className="text-muted-foreground mt-1">Monitor and support with care</p>
             </div>
             <div className="flex items-center space-x-4">
-              <Link to="/select-mode">
+              <Link to="/">
                 <Button variant="outline" size="lg" className="rounded-xl">
-                  Switch Mode
+                  Home
                 </Button>
               </Link>
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="w-6 h-6" />
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-destructive rounded-full"></span>
+              </Button>
+              <Button variant="ghost" size="icon" onClick={handleSignOut}>
+                <LogOut className="w-6 h-6" />
               </Button>
             </div>
           </div>

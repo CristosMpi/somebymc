@@ -1,15 +1,42 @@
-import { useState } from "react";
-import { Home, Phone, MapPin } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Home, Phone, MapPin, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import GPSTracker from "@/components/GPSTracker";
+import { GPSPosition } from "@/hooks/useGPSTracking";
 
 const DementiaUser = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { user, loading, signOut } = useAuth();
   const [helpRequested, setHelpRequested] = useState(false);
+  const [trackingEnabled, setTrackingEnabled] = useState(true);
+  const [currentLocation, setCurrentLocation] = useState<GPSPosition | null>(null);
 
-  const handleHelpRequest = () => {
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate("/auth");
+    }
+  }, [user, loading, navigate]);
+
+  const handleHelpRequest = async () => {
     setHelpRequested(true);
+    
+    // Create SOS alert in database
+    if (user && currentLocation) {
+      await supabase.from("alerts").insert({
+        dementia_user_id: user.id,
+        alert_type: "sos",
+        severity: "critical",
+        message: "SOS: Help requested by user",
+        location_lat: currentLocation.latitude,
+        location_lng: currentLocation.longitude,
+      });
+    }
+    
     toast({
       title: "Help is on the way",
       description: "Your caregiver has been notified. Stay where you are.",
@@ -17,11 +44,28 @@ const DementiaUser = () => {
     });
   };
 
+  const handleLocationUpdate = (position: GPSPosition) => {
+    setCurrentLocation(position);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/auth");
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-xl text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background p-6 flex flex-col">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
-        <Link to="/select-mode">
+        <Link to="/">
           <Button variant="ghost" size="lg" className="text-2xl px-6 py-8 rounded-2xl">
             <Home className="w-8 h-8" />
           </Button>
@@ -30,11 +74,20 @@ const DementiaUser = () => {
           <p className="text-3xl font-bold text-foreground">Hello!</p>
           <p className="text-xl text-muted-foreground">You're doing great</p>
         </div>
-        <div className="w-20"></div>
+        <Button
+          variant="ghost"
+          size="lg"
+          onClick={handleSignOut}
+          className="text-2xl px-6 py-8 rounded-2xl"
+        >
+          <LogOut className="w-8 h-8" />
+        </Button>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center justify-center space-y-12 max-w-2xl mx-auto w-full">
+      <div className="flex-1 flex flex-col items-center justify-center space-y-8 max-w-2xl mx-auto w-full">
+        {/* GPS Tracker */}
+        <GPSTracker enabled={trackingEnabled} onLocationUpdate={handleLocationUpdate} />
         {/* Current Route Status */}
         <div className="w-full bg-card rounded-3xl p-8 shadow-card">
           <div className="flex items-center justify-between">
