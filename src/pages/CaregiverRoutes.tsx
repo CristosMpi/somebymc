@@ -4,17 +4,39 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import RoutesMap from "@/components/RoutesMap";
 
 const CaregiverRoutes = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
+  const [dementiaUserId, setDementiaUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
       navigate("/auth");
     }
   }, [user, loading, navigate]);
+
+  useEffect(() => {
+    const fetchDementiaUser = async () => {
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('caregiving_relationships')
+        .select('dementia_user_id')
+        .eq('caregiver_id', user.id)
+        .limit(1)
+        .maybeSingle();
+
+      if (data) {
+        setDementiaUserId(data.dementia_user_id);
+      }
+    };
+
+    fetchDementiaUser();
+  }, [user]);
 
   if (loading) {
     return (
@@ -81,6 +103,28 @@ const CaregiverRoutes = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">
+        {/* Routes Map */}
+        <div className="mb-8">
+          <Card className="p-6 rounded-2xl shadow-card">
+            <h2 className="text-2xl font-bold text-foreground mb-4">Routes Overview</h2>
+            {dementiaUserId ? (
+              <div className="rounded-2xl h-[500px] overflow-hidden border-2 border-border">
+                <RoutesMap dementiaUserId={dementiaUserId} className="h-full" />
+              </div>
+            ) : (
+              <div className="bg-muted/30 rounded-2xl h-[500px] flex items-center justify-center border-2 border-border">
+                <div className="text-center space-y-2">
+                  <Map className="w-16 h-16 text-primary mx-auto" />
+                  <p className="text-muted-foreground">No patient assigned</p>
+                  <p className="text-sm text-muted-foreground">
+                    Connect with a dementia user to manage routes
+                  </p>
+                </div>
+              </div>
+            )}
+          </Card>
+        </div>
+
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Route List */}
           <div className="lg:col-span-2 space-y-6">
