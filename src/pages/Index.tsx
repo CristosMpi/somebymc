@@ -29,23 +29,25 @@ const Index = () => {
             </p>
             
             <div className="pt-8 flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/auth" className="group">
-                <Button
-                  size="lg"
-                  className="text-xl px-12 py-8 rounded-2xl bg-gradient-calm backdrop-blur-lg border border-primary/20 shadow-elegant hover:shadow-button hover:scale-105 transition-all duration-300"
-                >
+              <Button
+                asChild
+                size="lg"
+                className="text-xl px-12 py-8 rounded-2xl bg-gradient-calm backdrop-blur-lg border border-primary/20 shadow-elegant hover:shadow-button hover:scale-105 transition-all duration-300 group"
+              >
+                <Link to="/auth">
                   Get Started
                   <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              <Link to="/select-mode" className="group">
-                <Button
-                  size="lg"
-                  className="text-xl px-12 py-8 rounded-2xl backdrop-blur-xl bg-background/40 border-2 border-border/50 hover:bg-background/60 hover:border-primary/50 shadow-soft hover:shadow-elegant transition-all duration-300"
-                >
+                </Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                className="text-xl px-12 py-8 rounded-2xl backdrop-blur-xl bg-background/40 border-2 border-border/50 hover:bg-background/60 hover:border-primary/50 shadow-soft hover:shadow-elegant transition-all duration-300"
+              >
+                <Link to="/select-mode">
                   Learn More
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
@@ -154,15 +156,16 @@ const Index = () => {
               Soma is here to help individuals with dementia maintain independence while giving
               caregivers the tools they need for peace of mind.
             </p>
-            <Link to="/auth" className="group inline-block">
-              <Button
-                size="lg"
-                className="text-xl px-12 py-8 rounded-2xl bg-gradient-calm backdrop-blur-lg border border-primary/20 shadow-button hover:shadow-elegant hover:scale-105 transition-all duration-300"
-              >
+            <Button
+              asChild
+              size="lg"
+              className="text-xl px-12 py-8 rounded-2xl bg-gradient-calm backdrop-blur-lg border border-primary/20 shadow-button hover:shadow-elegant hover:scale-105 transition-all duration-300 group"
+            >
+              <Link to="/auth">
                 Start Using Soma
                 <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
