@@ -14,16 +14,388 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          dementia_user_id: string
+          id: string
+          is_resolved: boolean | null
+          location_lat: number | null
+          location_lng: number | null
+          message: string
+          resolved_at: string | null
+          route_id: string | null
+          severity: string
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string
+          dementia_user_id: string
+          id?: string
+          is_resolved?: boolean | null
+          location_lat?: number | null
+          location_lng?: number | null
+          message: string
+          resolved_at?: string | null
+          route_id?: string | null
+          severity: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          dementia_user_id?: string
+          id?: string
+          is_resolved?: boolean | null
+          location_lat?: number | null
+          location_lng?: number | null
+          message?: string
+          resolved_at?: string | null
+          route_id?: string | null
+          severity?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alerts_dementia_user_id_fkey"
+            columns: ["dementia_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alerts_route_id_fkey"
+            columns: ["route_id"]
+            isOneToOne: false
+            referencedRelation: "safe_routes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      buddy_watch: {
+        Row: {
+          address: string | null
+          created_at: string
+          dementia_user_id: string
+          id: string
+          is_active: boolean | null
+          is_verified: boolean | null
+          latitude: number | null
+          longitude: number | null
+          name: string
+          phone: string | null
+          relation: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          dementia_user_id: string
+          id?: string
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          phone?: string | null
+          relation?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          dementia_user_id?: string
+          id?: string
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          phone?: string | null
+          relation?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "buddy_watch_dementia_user_id_fkey"
+            columns: ["dementia_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      caregiving_relationships: {
+        Row: {
+          caregiver_id: string
+          created_at: string
+          dementia_user_id: string
+          emergency_contact: boolean | null
+          id: string
+          relationship_type: string | null
+        }
+        Insert: {
+          caregiver_id: string
+          created_at?: string
+          dementia_user_id: string
+          emergency_contact?: boolean | null
+          id?: string
+          relationship_type?: string | null
+        }
+        Update: {
+          caregiver_id?: string
+          created_at?: string
+          dementia_user_id?: string
+          emergency_contact?: boolean | null
+          id?: string
+          relationship_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "caregiving_relationships_caregiver_id_fkey"
+            columns: ["caregiver_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "caregiving_relationships_dementia_user_id_fkey"
+            columns: ["dementia_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      location_points: {
+        Row: {
+          created_at: string
+          dementia_user_id: string
+          description: string | null
+          id: string
+          latitude: number
+          longitude: number
+          name: string
+          point_type: string
+          route_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          dementia_user_id: string
+          description?: string | null
+          id?: string
+          latitude: number
+          longitude: number
+          name: string
+          point_type: string
+          route_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          dementia_user_id?: string
+          description?: string | null
+          id?: string
+          latitude?: number
+          longitude?: number
+          name?: string
+          point_type?: string
+          route_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "location_points_dementia_user_id_fkey"
+            columns: ["dementia_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "location_points_route_id_fkey"
+            columns: ["route_id"]
+            isOneToOne: false
+            referencedRelation: "safe_routes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      location_tracking: {
+        Row: {
+          accuracy: number | null
+          deviation_meters: number | null
+          heading: number | null
+          id: string
+          is_on_route: boolean | null
+          latitude: number
+          longitude: number
+          route_id: string | null
+          speed: number | null
+          timestamp: string
+          user_id: string
+        }
+        Insert: {
+          accuracy?: number | null
+          deviation_meters?: number | null
+          heading?: number | null
+          id?: string
+          is_on_route?: boolean | null
+          latitude: number
+          longitude: number
+          route_id?: string | null
+          speed?: number | null
+          timestamp?: string
+          user_id: string
+        }
+        Update: {
+          accuracy?: number | null
+          deviation_meters?: number | null
+          heading?: number | null
+          id?: string
+          is_on_route?: boolean | null
+          latitude?: number
+          longitude?: number
+          route_id?: string | null
+          speed?: number | null
+          timestamp?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "location_tracking_route_id_fkey"
+            columns: ["route_id"]
+            isOneToOne: false
+            referencedRelation: "safe_routes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "location_tracking_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string
+          id: string
+          phone: string | null
+          updated_at: string
+          user_type: Database["public"]["Enums"]["user_type"]
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name: string
+          id: string
+          phone?: string | null
+          updated_at?: string
+          user_type: Database["public"]["Enums"]["user_type"]
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_type?: Database["public"]["Enums"]["user_type"]
+        }
+        Relationships: []
+      }
+      safe_routes: {
+        Row: {
+          created_at: string
+          created_by: string
+          dementia_user_id: string
+          description: string | null
+          distance_meters: number | null
+          estimated_duration_minutes: number | null
+          id: string
+          is_active: boolean | null
+          name: string
+          path_data: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          dementia_user_id: string
+          description?: string | null
+          distance_meters?: number | null
+          estimated_duration_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          path_data: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          dementia_user_id?: string
+          description?: string | null
+          distance_meters?: number | null
+          estimated_duration_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          path_data?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "safe_routes_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "safe_routes_dementia_user_id_fkey"
+            columns: ["dementia_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_caregiver_for: {
+        Args: { _caregiver_id: string; _dementia_user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "caregiver" | "dementia_user"
+      user_type: "caregiver" | "dementia_user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +522,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "caregiver", "dementia_user"],
+      user_type: ["caregiver", "dementia_user"],
+    },
   },
 } as const

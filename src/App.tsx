@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import Auth from "./pages/Auth";
 import SelectMode from "./pages/SelectMode";
 import DementiaUser from "./pages/DementiaUser";
 import Caregiver from "./pages/Caregiver";
@@ -22,6 +23,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/select-mode" element={<SelectMode />} />
           <Route path="/dementia-user" element={<DementiaUser />} />
           <Route path="/caregiver" element={<Caregiver />} />

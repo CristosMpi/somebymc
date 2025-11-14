@@ -19,14 +19,23 @@ const Index = () => {
               Guided routes, real-time monitoring, and intelligent prevention tools — all wrapped
               in a calming, dignified interface
             </p>
-            <div className="pt-6">
-              <Link to="/select-mode">
+            <div className="pt-6 flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/auth">
                 <Button
                   size="lg"
                   className="text-xl px-12 py-8 rounded-2xl bg-white text-primary hover:bg-white/90 shadow-soft"
                 >
-                  Get Started
+                  Sign In / Sign Up
                   <ArrowRight className="ml-3 w-6 h-6" />
+                </Button>
+              </Link>
+              <Link to="/select-mode">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="text-xl px-12 py-8 rounded-2xl border-2 border-white text-primary-foreground hover:bg-white/10"
+                >
+                  Learn More
                 </Button>
               </Link>
             </div>

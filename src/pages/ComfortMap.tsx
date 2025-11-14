@@ -1,10 +1,29 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Heart, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from "react";
 
 const ComfortMap = () => {
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate("/auth");
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-xl text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
+
   const comfortPoints = [
     { id: 1, name: "Corner Cafe", type: "comfort", description: "Favorite coffee spot" },
     { id: 2, name: "Park Bench", type: "comfort", description: "Peaceful resting place" },
