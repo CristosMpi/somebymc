@@ -11,6 +11,7 @@ import Caregiver from "./pages/Caregiver";
 import CaregiverRoutes from "./pages/CaregiverRoutes";
 import ComfortMap from "./pages/ComfortMap";
 import BuddyWatch from "./pages/BuddyWatch";
+import ProfileSettings from "./pages/ProfileSettings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/select-mode" element={<SelectMode />} />
           <Route path="/dementia-user" element={<DementiaUser />} />
+          <Route path="/dementia-user/profile" element={<ProfileSettings />} />
           <Route path="/caregiver" element={<Caregiver />} />
           <Route path="/caregiver/routes" element={<CaregiverRoutes />} />
           <Route path="/caregiver/comfort-map" element={<ComfortMap />} />

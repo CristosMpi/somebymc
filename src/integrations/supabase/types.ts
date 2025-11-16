@@ -129,6 +129,9 @@ export type Database = {
           emergency_contact: boolean | null
           id: string
           relationship_type: string | null
+          requested_at: string
+          responded_at: string | null
+          status: Database["public"]["Enums"]["connection_status"]
         }
         Insert: {
           caregiver_id: string
@@ -137,6 +140,9 @@ export type Database = {
           emergency_contact?: boolean | null
           id?: string
           relationship_type?: string | null
+          requested_at?: string
+          responded_at?: string | null
+          status?: Database["public"]["Enums"]["connection_status"]
         }
         Update: {
           caregiver_id?: string
@@ -145,6 +151,9 @@ export type Database = {
           emergency_contact?: boolean | null
           id?: string
           relationship_type?: string | null
+          requested_at?: string
+          responded_at?: string | null
+          status?: Database["public"]["Enums"]["connection_status"]
         }
         Relationships: [
           {
@@ -395,6 +404,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "caregiver" | "dementia_user"
+      connection_status: "pending" | "approved" | "rejected"
       user_type: "caregiver" | "dementia_user"
     }
     CompositeTypes: {
@@ -524,6 +534,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "caregiver", "dementia_user"],
+      connection_status: ["pending", "approved", "rejected"],
       user_type: ["caregiver", "dementia_user"],
     },
   },

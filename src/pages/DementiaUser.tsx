@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Home, Phone, MapPin, LogOut } from "lucide-react";
+import { Home, Phone, MapPin, LogOut, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Link, useNavigate } from "react-router-dom";
@@ -74,14 +74,25 @@ const DementiaUser = () => {
           <p className="text-3xl font-bold text-foreground">Hello!</p>
           <p className="text-xl text-muted-foreground">You're doing great</p>
         </div>
-        <Button
-          variant="ghost"
-          size="lg"
-          onClick={handleSignOut}
-          className="text-2xl px-6 py-8 rounded-2xl"
-        >
-          <LogOut className="w-8 h-8" />
-        </Button>
+        <div className="flex space-x-2">
+          <Link to="/dementia-user/profile">
+            <Button
+              variant="ghost"
+              size="lg"
+              className="text-2xl px-6 py-8 rounded-2xl"
+            >
+              <Settings className="w-8 h-8" />
+            </Button>
+          </Link>
+          <Button
+            variant="ghost"
+            size="lg"
+            onClick={handleSignOut}
+            className="text-2xl px-6 py-8 rounded-2xl"
+          >
+            <LogOut className="w-8 h-8" />
+          </Button>
+        </div>
       </div>
 
       {/* Main Content */}
