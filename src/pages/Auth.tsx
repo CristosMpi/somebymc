@@ -37,6 +37,7 @@ const Auth = () => {
   const [displayName, setDisplayName] = useState("");
   const [userType, setUserType] = useState<"caregiver" | "dementia_user">("caregiver");
   const [errors, setErrors] = useState<{ email?: string; password?: string; displayName?: string }>({});
+  const [activeTab, setActiveTab] = useState<"signin" | "signup">("signin");
 
   useEffect(() => {
     // Check current session
@@ -59,6 +60,11 @@ const Auth = () => {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  // Clear errors when switching tabs
+  useEffect(() => {
+    setErrors({});
+  }, [activeTab]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -174,7 +180,7 @@ const Auth = () => {
           <p className="text-muted-foreground">Compassionate care, dignified support</p>
         </div>
 
-        <Tabs defaultValue="signin" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "signin" | "signup")} className="space-y-6">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="signin">Sign In</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -189,7 +195,10 @@ const Auth = () => {
                   type="email"
                   placeholder="your@email.com"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setErrors((prev) => ({ ...prev, email: undefined }));
+                  }}
                   required
                   className="rounded-xl"
                 />
@@ -203,7 +212,10 @@ const Auth = () => {
                   type="password"
                   placeholder="••••••••"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setErrors((prev) => ({ ...prev, password: undefined }));
+                  }}
                   required
                   className="rounded-xl"
                 />
@@ -236,7 +248,10 @@ const Auth = () => {
                   type="text"
                   placeholder="Your name"
                   value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
+                  onChange={(e) => {
+                    setDisplayName(e.target.value);
+                    setErrors((prev) => ({ ...prev, displayName: undefined }));
+                  }}
                   required
                   className="rounded-xl"
                 />
@@ -277,7 +292,10 @@ const Auth = () => {
                   type="email"
                   placeholder="your@email.com"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setErrors((prev) => ({ ...prev, email: undefined }));
+                  }}
                   required
                   className="rounded-xl"
                 />
@@ -291,7 +309,10 @@ const Auth = () => {
                   type="password"
                   placeholder="••••••••"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setErrors((prev) => ({ ...prev, password: undefined }));
+                  }}
                   required
                   minLength={6}
                   className="rounded-xl"
