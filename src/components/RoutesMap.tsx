@@ -48,24 +48,7 @@ const RoutesMap = ({ dementiaUserId, selectedRouteId, className = '' }: RoutesMa
     fetchRoutes();
   }, [dementiaUserId, toast]);
 
-  if (loading) {
-    return (
-      <div className={`bg-muted/30 rounded-2xl h-full flex items-center justify-center ${className}`}>
-        <p className="text-muted-foreground">Loading routes...</p>
-      </div>
-    );
-  }
-
-  if (routes.length === 0) {
-    return (
-      <div className={`bg-muted/30 rounded-2xl h-full flex items-center justify-center ${className}`}>
-        <div className="text-center space-y-2">
-          <p className="text-muted-foreground">No routes created yet</p>
-          <p className="text-sm text-muted-foreground">Create a route to see it on the map</p>
-        </div>
-      </div>
-    );
-  }
+  // Always show map, even when loading or no data
 
   // Filter routes if a specific one is selected
   const displayRoutes = selectedRouteId
