@@ -7,11 +7,15 @@ import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import ComfortPointsMap from "@/components/ComfortPointsMap";
+import AddComfortPointDialog from "@/components/AddComfortPointDialog";
 
 const ComfortMap = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const [dementiaUserId, setDementiaUserId] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedCoords, setSelectedCoords] = useState<{ lng: number; lat: number } | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -37,6 +41,15 @@ const ComfortMap = () => {
 
     fetchDementiaUser();
   }, [user]);
+
+  const handleMapClick = (lngLat: { lng: number; lat: number }) => {
+    setSelectedCoords(lngLat);
+    setDialogOpen(true);
+  };
+
+  const handleSuccess = () => {
+    setRefreshKey((prev) => prev + 1);
+  };
 
   if (loading) {
     return (
@@ -66,9 +79,13 @@ const ComfortMap = () => {
                 </p>
               </div>
             </div>
-            <Button className="rounded-xl bg-gradient-warm text-foreground hover:opacity-90 shadow-button">
+            <Button 
+              className="rounded-xl bg-gradient-warm text-foreground hover:opacity-90 shadow-button"
+              disabled={!dementiaUserId}
+              onClick={() => setDialogOpen(true)}
+            >
               <MapPin className="w-5 h-5 mr-2" />
-              Add Location
+              Add Location (Click Map)
             </Button>
           </div>
         </div>
@@ -94,7 +111,12 @@ const ComfortMap = () => {
 
               {dementiaUserId ? (
                 <div className="rounded-2xl h-[600px] overflow-hidden border-2 border-border">
-                  <ComfortPointsMap dementiaUserId={dementiaUserId} className="h-full" />
+                  <ComfortPointsMap 
+                    key={refreshKey}
+                    dementiaUserId={dementiaUserId} 
+                    onPointClick={handleMapClick}
+                    className="h-full" 
+                  />
                 </div>
               ) : (
                 <div className="bg-muted/30 rounded-2xl h-[600px] flex items-center justify-center border-2 border-border">
@@ -123,6 +145,16 @@ const ComfortMap = () => {
           </div>
         </div>
       </main>
+
+      {dementiaUserId && (
+        <AddComfortPointDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          coordinates={selectedCoords}
+          dementiaUserId={dementiaUserId}
+          onSuccess={handleSuccess}
+        />
+      )}
     </div>
   );
 };
