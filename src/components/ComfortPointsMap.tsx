@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 
 interface ComfortPointsMapProps {
   dementiaUserId: string;
-  onPointClick?: (pointId: string) => void;
+  onPointClick?: (lngLat: { lng: number; lat: number }) => void;
   className?: string;
 }
 
@@ -23,8 +23,7 @@ const ComfortPointsMap = ({ dementiaUserId, onPointClick, className = '' }: Comf
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchPoints = async () => {
+  const fetchPoints = async () => {
       try {
         const { data, error } = await supabase
           .from('location_points')
@@ -47,6 +46,7 @@ const ComfortPointsMap = ({ dementiaUserId, onPointClick, className = '' }: Comf
       }
     };
 
+  useEffect(() => {
     fetchPoints();
 
     // Subscribe to real-time updates
@@ -123,10 +123,7 @@ const ComfortPointsMap = ({ dementiaUserId, onPointClick, className = '' }: Comf
       center={center}
       zoom={13}
       markers={markers}
-      onMapClick={(lngLat) => {
-        console.log('Map clicked at:', lngLat);
-        // Could implement adding new points here
-      }}
+      onMapClick={onPointClick}
       className={className}
     />
   );

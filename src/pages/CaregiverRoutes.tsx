@@ -7,11 +7,14 @@ import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import RoutesMap from "@/components/RoutesMap";
+import CreateRouteDialog from "@/components/CreateRouteDialog";
 
 const CaregiverRoutes = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const [dementiaUserId, setDementiaUserId] = useState<string | null>(null);
+  const [createRouteOpen, setCreateRouteOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -37,6 +40,10 @@ const CaregiverRoutes = () => {
 
     fetchDementiaUser();
   }, [user]);
+
+  const handleSuccess = () => {
+    setRefreshKey((prev) => prev + 1);
+  };
 
   if (loading) {
     return (
@@ -93,7 +100,11 @@ const CaregiverRoutes = () => {
                 <p className="text-muted-foreground mt-1">Create and manage walking routes</p>
               </div>
             </div>
-            <Button className="rounded-xl bg-gradient-calm text-primary-foreground hover:opacity-90 shadow-button">
+            <Button 
+              className="rounded-xl bg-gradient-calm text-primary-foreground hover:opacity-90 shadow-button"
+              disabled={!dementiaUserId || !user}
+              onClick={() => setCreateRouteOpen(true)}
+            >
               <Plus className="w-5 h-5 mr-2" />
               Create New Route
             </Button>
@@ -109,7 +120,7 @@ const CaregiverRoutes = () => {
             <h2 className="text-2xl font-bold text-foreground mb-4">Routes Overview</h2>
             {dementiaUserId ? (
               <div className="rounded-2xl h-[500px] overflow-hidden border-2 border-border">
-                <RoutesMap dementiaUserId={dementiaUserId} className="h-full" />
+                <RoutesMap key={refreshKey} dementiaUserId={dementiaUserId} className="h-full" />
               </div>
             ) : (
               <div className="bg-muted/30 rounded-2xl h-[500px] flex items-center justify-center border-2 border-border">
@@ -235,6 +246,16 @@ const CaregiverRoutes = () => {
           </div>
         </div>
       </main>
+
+      {dementiaUserId && user && (
+        <CreateRouteDialog
+          open={createRouteOpen}
+          onOpenChange={setCreateRouteOpen}
+          dementiaUserId={dementiaUserId}
+          caregiverId={user.id}
+          onSuccess={handleSuccess}
+        />
+      )}
     </div>
   );
 };
