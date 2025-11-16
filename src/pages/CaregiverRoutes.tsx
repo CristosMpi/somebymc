@@ -177,28 +177,14 @@ const CaregiverRoutes = () => {
         <div className="mb-8">
           <Card className="p-6 rounded-2xl shadow-card">
             <h2 className="text-2xl font-bold text-foreground mb-4">Routes Overview</h2>
-            {dementiaUserId ? (
-              <div className="rounded-2xl h-[500px] overflow-hidden border-2 border-border">
-                <RoutesMap 
-                  key={refreshKey} 
-                  dementiaUserId={dementiaUserId} 
-                  selectedRouteId={selectedRouteId}
-                  className="h-full" 
-                />
-              </div>
-            ) : (
-              <div className="bg-muted/30 rounded-2xl h-[500px] flex items-center justify-center border-2 border-dashed border-border">
-                <div className="text-center space-y-3">
-                  <div className="w-20 h-20 rounded-full bg-muted mx-auto flex items-center justify-center">
-                    <Map className="w-10 h-10 text-muted-foreground" />
-                  </div>
-                  <p className="text-lg font-semibold text-foreground">Map Unavailable</p>
-                  <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-                    Connect with a patient to view and create routes on the map
-                  </p>
-                </div>
-              </div>
-            )}
+            <div className="rounded-2xl h-[500px] overflow-hidden border-2 border-border">
+              <RoutesMap 
+                key={refreshKey} 
+                dementiaUserId={dementiaUserId || ''} 
+                selectedRouteId={selectedRouteId}
+                className="h-full" 
+              />
+            </div>
           </Card>
         </div>
 

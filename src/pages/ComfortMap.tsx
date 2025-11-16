@@ -146,28 +146,14 @@ const ComfortMap = () => {
                 </div>
               </div>
 
-              {dementiaUserId ? (
-                <div className="rounded-2xl h-[600px] overflow-hidden border-2 border-border">
-                  <ComfortPointsMap 
-                    key={refreshKey}
-                    dementiaUserId={dementiaUserId} 
-                    onPointClick={handleMapClick}
-                    className="h-full" 
-                  />
-                </div>
-              ) : (
-                <div className="bg-muted/30 rounded-2xl h-[600px] flex items-center justify-center border-2 border-dashed border-border">
-                  <div className="text-center space-y-3">
-                    <div className="w-20 h-20 rounded-full bg-muted mx-auto flex items-center justify-center">
-                      <MapPin className="w-10 h-10 text-muted-foreground" />
-                    </div>
-                    <p className="text-lg font-semibold text-foreground">Map Unavailable</p>
-                    <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-                      Connect with a patient to mark comfort and stress points
-                    </p>
-                  </div>
-                </div>
-              )}
+              <div className="rounded-2xl h-[600px] overflow-hidden border-2 border-border">
+                <ComfortPointsMap 
+                  key={refreshKey}
+                  dementiaUserId={dementiaUserId || ''} 
+                  onPointClick={handleMapClick}
+                  className="h-full" 
+                />
+              </div>
             </Card>
           </div>
 
