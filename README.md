@@ -4,70 +4,72 @@
 
 **URL**: https://lovable.dev/projects/2a2ec852-e4db-4f19-90f0-b90bca06cfd9
 
-## How can I edit this code?
+Soma
 
-There are several ways of editing your application.
+Safety & Dignity in Motion
 
-**Use Lovable**
+Soma is a dual-mode navigation and safety app designed for individuals living with dementia and their caregivers. It combines real-time GPS tracking, route monitoring, emotional comfort mapping, and emergency response — while preserving the user’s autonomy and sense of independence.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/2a2ec852-e4db-4f19-90f0-b90bca06cfd9) and start prompting.
+🌿 Key Features
 
-Changes made via Lovable will be committed automatically to this repo.
+For Dementia Users
 
-**Use your preferred IDE**
+Simple, calming interface with large buttons
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Real-time location awareness
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+One-tap SOS emergency button
 
-Follow these steps:
+Route guidance with friendly visuals
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+For Caregivers
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Live GPS tracking with automatic updates
 
-# Step 3: Install the necessary dependencies.
-npm i
+Safe route creation & monitoring
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+Comfort & stress point mapping
 
-**Edit a file directly in GitHub**
+Buddy Watch: trusted neighbors & contacts
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Real-time alerts (SOS, route deviation, inactivity, etc.)
 
-**Use GitHub Codespaces**
+🧠 Core Innovations
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Emotional geography (comfort vs stress zones)
 
-## What technologies are used for this project?
+Dual-mode UX based on role
 
-This project is built with:
+Real-time WebSocket location updates
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Predictive wander-risk system (AI-ready)
 
-## How can I deploy this project?
+Privacy by design with RLS security
 
-Simply open [Lovable](https://lovable.dev/projects/2a2ec852-e4db-4f19-90f0-b90bca06cfd9) and click on Share -> Publish.
+No external map API required (OSM + MapLibre)
 
-## Can I connect a custom domain to my Lovable project?
+🛠️ Tech Stack
 
-Yes, you can!
+Frontend: React, TypeScript, Vite
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Maps: MapLibre GL, OpenStreetMap
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Backend: Supabase (Postgres, Auth, Realtime)
+
+UI: Tailwind, shadcn/ui, Radix
+
+Validation & Logic: Zod, TanStack Query
+
+🔒 Security
+
+Full Row-Level Security
+
+Role-based access (caregiver / dementia user)
+
+Patient-approved connections
+
+Private location & alert channels
+
+🚀 Vision
+
+To empower dementia patients with safe independence — and give caregivers peace of mind through smart, respectful technology.
