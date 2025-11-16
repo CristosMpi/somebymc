@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
 
 interface LocationMapProps {
   center?: [number, number];
@@ -29,31 +29,23 @@ const LocationMap = ({
   className = '',
 }: LocationMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const map = useRef<maplibregl.Map | null>(null);
+  const markersRef = useRef<maplibregl.Marker[]>([]);
   const [mapLoaded, setMapLoaded] = useState(false);
 
   // Initialize map
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
 
-    const token = import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN;
-    if (!token) {
-      console.error('Mapbox token not found');
-      return;
-    }
-
-    mapboxgl.accessToken = token;
-
-    map.current = new mapboxgl.Map({
+    map.current = new maplibregl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
+      style: 'https://demotiles.maplibre.org/style.json',
       center,
       zoom,
     });
 
     map.current.addControl(
-      new mapboxgl.NavigationControl({
+      new maplibregl.NavigationControl({
         visualizePitch: true,
       }),
       'top-right'
@@ -95,13 +87,13 @@ const LocationMap = ({
       el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
       el.style.cursor = 'pointer';
 
-      const marker = new mapboxgl.Marker(el)
+      const marker = new maplibregl.Marker(el)
         .setLngLat(markerData.coordinates)
         .addTo(map.current!);
 
       if (markerData.label) {
         marker.setPopup(
-          new mapboxgl.Popup({ offset: 25 }).setHTML(`<p>${markerData.label}</p>`)
+          new maplibregl.Popup({ offset: 25 }).setHTML(`<p>${markerData.label}</p>`)
         );
       }
 
