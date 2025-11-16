@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Heart, AlertTriangle } from "lucide-react";
+import { ArrowLeft, MapPin, Heart, AlertTriangle, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,12 +8,14 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import ComfortPointsMap from "@/components/ComfortPointsMap";
 import AddComfortPointDialog from "@/components/AddComfortPointDialog";
+import SendConnectionRequest from "@/components/SendConnectionRequest";
 
 const ComfortMap = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const [dementiaUserId, setDementiaUserId] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [connectionRequestOpen, setConnectionRequestOpen] = useState(false);
   const [selectedCoords, setSelectedCoords] = useState<{ lng: number; lat: number } | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -31,6 +33,7 @@ const ComfortMap = () => {
         .from('caregiving_relationships')
         .select('dementia_user_id')
         .eq('caregiver_id', user.id)
+        .eq('status', 'approved')
         .limit(1)
         .maybeSingle();
 
@@ -40,7 +43,7 @@ const ComfortMap = () => {
     };
 
     fetchDementiaUser();
-  }, [user]);
+  }, [user, refreshKey]);
 
   const handleMapClick = (lngLat: { lng: number; lat: number }) => {
     setSelectedCoords(lngLat);
@@ -109,10 +112,18 @@ const ComfortMap = () => {
                 <div className="bg-card/50 rounded-xl p-4 border border-border">
                   <p className="text-sm font-semibold text-foreground mb-2">How to connect with a patient:</p>
                   <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
-                    <li>Have the dementia user create an account</li>
-                    <li>They will share their User ID with you</li>
-                    <li>You can then establish a caregiving relationship</li>
+                    <li>Click "Send Connection Request" below</li>
+                    <li>Enter the patient's User ID (they'll find this in their profile)</li>
+                    <li>Wait for the patient to approve your request</li>
+                    <li>Once approved, you can mark comfort and stress points for them</li>
                   </ol>
+                  <Button
+                    className="mt-4 w-full rounded-xl bg-gradient-warm text-foreground"
+                    onClick={() => setConnectionRequestOpen(true)}
+                  >
+                    <UserPlus className="w-5 h-5 mr-2" />
+                    Send Connection Request
+                  </Button>
                 </div>
               </div>
             </div>
@@ -180,6 +191,15 @@ const ComfortMap = () => {
           onOpenChange={setDialogOpen}
           coordinates={selectedCoords}
           dementiaUserId={dementiaUserId}
+          onSuccess={handleSuccess}
+        />
+      )}
+
+      {user && (
+        <SendConnectionRequest
+          open={connectionRequestOpen}
+          onOpenChange={setConnectionRequestOpen}
+          caregiverId={user.id}
           onSuccess={handleSuccess}
         />
       )}

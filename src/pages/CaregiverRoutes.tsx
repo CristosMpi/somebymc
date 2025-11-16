@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, Map, Clock, CheckCircle } from "lucide-react";
+import { ArrowLeft, Plus, Map, Clock, CheckCircle, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import RoutesMap from "@/components/RoutesMap";
 import CreateRouteDialog from "@/components/CreateRouteDialog";
+import SendConnectionRequest from "@/components/SendConnectionRequest";
 
 interface RouteData {
   id: string;
@@ -24,6 +25,7 @@ const CaregiverRoutes = () => {
   const { user, loading } = useAuth();
   const [dementiaUserId, setDementiaUserId] = useState<string | null>(null);
   const [createRouteOpen, setCreateRouteOpen] = useState(false);
+  const [connectionRequestOpen, setConnectionRequestOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [routes, setRoutes] = useState<RouteData[]>([]);
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
@@ -43,6 +45,7 @@ const CaregiverRoutes = () => {
         .from('caregiving_relationships')
         .select('dementia_user_id')
         .eq('caregiver_id', user.id)
+        .eq('status', 'approved')
         .limit(1)
         .maybeSingle();
 
@@ -52,7 +55,7 @@ const CaregiverRoutes = () => {
     };
 
     fetchDementiaUser();
-  }, [user]);
+  }, [user, refreshKey]);
 
   useEffect(() => {
     const fetchRoutes = async () => {
@@ -152,10 +155,18 @@ const CaregiverRoutes = () => {
                 <div className="bg-card/50 rounded-xl p-4 border border-border">
                   <p className="text-sm font-semibold text-foreground mb-2">How to connect with a patient:</p>
                   <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
-                    <li>Have the dementia user create an account</li>
-                    <li>They will share their User ID with you</li>
-                    <li>You can then establish a caregiving relationship</li>
+                    <li>Click "Send Connection Request" below</li>
+                    <li>Enter the patient's User ID (they'll find this in their profile)</li>
+                    <li>Wait for the patient to approve your request</li>
+                    <li>Once approved, you can create and manage routes for them</li>
                   </ol>
+                  <Button
+                    className="mt-4 w-full rounded-xl bg-gradient-calm text-primary-foreground"
+                    onClick={() => setConnectionRequestOpen(true)}
+                  >
+                    <UserPlus className="w-5 h-5 mr-2" />
+                    Send Connection Request
+                  </Button>
                 </div>
               </div>
             </div>
@@ -328,6 +339,15 @@ const CaregiverRoutes = () => {
           open={createRouteOpen}
           onOpenChange={setCreateRouteOpen}
           dementiaUserId={dementiaUserId}
+          caregiverId={user.id}
+          onSuccess={handleSuccess}
+        />
+      )}
+
+      {user && (
+        <SendConnectionRequest
+          open={connectionRequestOpen}
+          onOpenChange={setConnectionRequestOpen}
           caregiverId={user.id}
           onSuccess={handleSuccess}
         />
