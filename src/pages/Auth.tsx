@@ -10,6 +10,18 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { Heart, Shield, Loader2 } from "lucide-react";
 import { Session, User } from "@supabase/supabase-js";
+import { z } from "zod";
+
+const signInSchema = z.object({
+  email: z.string().trim().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+const signUpSchema = z.object({
+  email: z.string().trim().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  displayName: z.string().trim().min(1, 'Display name is required').max(100, 'Display name must be less than 100 characters'),
+});
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -24,6 +36,7 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [userType, setUserType] = useState<"caregiver" | "dementia_user">("caregiver");
+  const [errors, setErrors] = useState<{ email?: string; password?: string; displayName?: string }>({});
 
   useEffect(() => {
     // Check current session
@@ -49,16 +62,31 @@ const Auth = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate input
+    const validation = signUpSchema.safeParse({ email, password, displayName });
+    if (!validation.success) {
+      const fieldErrors: { email?: string; password?: string; displayName?: string } = {};
+      validation.error.errors.forEach((err) => {
+        if (err.path[0]) {
+          fieldErrors[err.path[0] as 'email' | 'password' | 'displayName'] = err.message;
+        }
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
+    setErrors({});
     setLoading(true);
 
     try {
       const { error } = await supabase.auth.signUp({
-        email,
-        password,
+        email: validation.data.email,
+        password: validation.data.password,
         options: {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
-            display_name: displayName,
+            display_name: validation.data.displayName,
             user_type: userType,
           },
         },
@@ -97,12 +125,27 @@ const Auth = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate input
+    const validation = signInSchema.safeParse({ email, password });
+    if (!validation.success) {
+      const fieldErrors: { email?: string; password?: string } = {};
+      validation.error.errors.forEach((err) => {
+        if (err.path[0]) {
+          fieldErrors[err.path[0] as 'email' | 'password'] = err.message;
+        }
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
+    setErrors({});
     setLoading(true);
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: validation.data.email,
+        password: validation.data.password,
       });
 
       if (error) {
@@ -150,6 +193,7 @@ const Auth = () => {
                   required
                   className="rounded-xl"
                 />
+                {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
               </div>
 
               <div className="space-y-2">
@@ -163,6 +207,7 @@ const Auth = () => {
                   required
                   className="rounded-xl"
                 />
+                {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
               </div>
 
               <Button
@@ -195,6 +240,7 @@ const Auth = () => {
                   required
                   className="rounded-xl"
                 />
+                {errors.displayName && <p className="text-sm text-destructive">{errors.displayName}</p>}
               </div>
 
               <div className="space-y-3">
@@ -235,6 +281,7 @@ const Auth = () => {
                   required
                   className="rounded-xl"
                 />
+                {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
               </div>
 
               <div className="space-y-2">
@@ -249,7 +296,11 @@ const Auth = () => {
                   minLength={6}
                   className="rounded-xl"
                 />
-                <p className="text-xs text-muted-foreground">Minimum 6 characters</p>
+                {errors.password ? (
+                  <p className="text-sm text-destructive">{errors.password}</p>
+                ) : (
+                  <p className="text-xs text-muted-foreground">Minimum 6 characters</p>
+                )}
               </div>
 
               <Button

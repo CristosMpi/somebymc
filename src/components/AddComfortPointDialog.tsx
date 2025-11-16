@@ -7,6 +7,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { z } from 'zod';
+
+const comfortPointSchema = z.object({
+  name: z.string().trim().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
+  description: z.string().max(500, 'Description must be less than 500 characters').optional(),
+});
 
 interface AddComfortPointDialogProps {
   open: boolean;
@@ -27,18 +33,33 @@ const AddComfortPointDialog = ({
   const [type, setType] = useState<'comfort' | 'stress' | 'safe'>('comfort');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<{ name?: string; description?: string }>({});
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!coordinates) return;
 
+    // Validate input
+    const validation = comfortPointSchema.safeParse({ name, description: description || undefined });
+    if (!validation.success) {
+      const fieldErrors: { name?: string; description?: string } = {};
+      validation.error.errors.forEach((err) => {
+        if (err.path[0]) {
+          fieldErrors[err.path[0] as 'name' | 'description'] = err.message;
+        }
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
+    setErrors({});
     setLoading(true);
     try {
       const { error } = await supabase.from('location_points').insert({
-        name,
+        name: validation.data.name,
         point_type: type,
-        description: description || null,
+        description: validation.data.description || null,
         latitude: coordinates.lat,
         longitude: coordinates.lng,
         dementia_user_id: dementiaUserId,
@@ -54,6 +75,7 @@ const AddComfortPointDialog = ({
       setName('');
       setDescription('');
       setType('comfort');
+      setErrors({});
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
@@ -88,6 +110,7 @@ const AddComfortPointDialog = ({
                 placeholder="e.g., Favorite Park"
                 required
               />
+              {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="type">Type</Label>
@@ -111,6 +134,7 @@ const AddComfortPointDialog = ({
                 placeholder="Add details about this location..."
                 rows={3}
               />
+              {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
             </div>
             {coordinates && (
               <div className="text-sm text-muted-foreground">

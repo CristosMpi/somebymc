@@ -8,6 +8,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import LocationMap from './LocationMap';
 import { MapPin, Trash2 } from 'lucide-react';
+import { z } from 'zod';
+
+const routeSchema = z.object({
+  name: z.string().trim().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
+  description: z.string().max(500, 'Description must be less than 500 characters').optional(),
+});
 
 interface CreateRouteDialogProps {
   open: boolean;
@@ -28,6 +34,7 @@ const CreateRouteDialog = ({
   const [description, setDescription] = useState('');
   const [waypoints, setWaypoints] = useState<[number, number][]>([]);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<{ name?: string; description?: string }>({});
   const { toast } = useToast();
 
   const handleMapClick = (lngLat: { lng: number; lat: number }) => {
@@ -49,11 +56,25 @@ const CreateRouteDialog = ({
       return;
     }
 
+    // Validate input
+    const validation = routeSchema.safeParse({ name, description: description || undefined });
+    if (!validation.success) {
+      const fieldErrors: { name?: string; description?: string } = {};
+      validation.error.errors.forEach((err) => {
+        if (err.path[0]) {
+          fieldErrors[err.path[0] as 'name' | 'description'] = err.message;
+        }
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
+    setErrors({});
     setLoading(true);
     try {
       const { error } = await supabase.from('safe_routes').insert({
-        name,
-        description: description || null,
+        name: validation.data.name,
+        description: validation.data.description || null,
         dementia_user_id: dementiaUserId,
         created_by: caregiverId,
         path_data: {
@@ -73,6 +94,7 @@ const CreateRouteDialog = ({
       setName('');
       setDescription('');
       setWaypoints([]);
+      setErrors({});
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
@@ -124,6 +146,7 @@ const CreateRouteDialog = ({
                 placeholder="e.g., Morning Walk"
                 required
               />
+              {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="route-description">Description (optional)</Label>
@@ -134,6 +157,7 @@ const CreateRouteDialog = ({
                 placeholder="Add details about this route..."
                 rows={2}
               />
+              {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
             </div>
             
             <div className="grid gap-2">
