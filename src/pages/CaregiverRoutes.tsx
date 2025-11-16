@@ -9,12 +9,25 @@ import { supabase } from "@/integrations/supabase/client";
 import RoutesMap from "@/components/RoutesMap";
 import CreateRouteDialog from "@/components/CreateRouteDialog";
 
+interface RouteData {
+  id: string;
+  name: string;
+  description: string | null;
+  distance_meters: number | null;
+  estimated_duration_minutes: number | null;
+  is_active: boolean | null;
+  path_data: any;
+}
+
 const CaregiverRoutes = () => {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const [dementiaUserId, setDementiaUserId] = useState<string | null>(null);
   const [createRouteOpen, setCreateRouteOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [routes, setRoutes] = useState<RouteData[]>([]);
+  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
+  const [loadingRoutes, setLoadingRoutes] = useState(true);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -41,8 +54,47 @@ const CaregiverRoutes = () => {
     fetchDementiaUser();
   }, [user]);
 
+  useEffect(() => {
+    const fetchRoutes = async () => {
+      if (!dementiaUserId) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('safe_routes')
+          .select('id, name, description, distance_meters, estimated_duration_minutes, is_active, path_data')
+          .eq('dementia_user_id', dementiaUserId)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        if (data) {
+          setRoutes(data);
+        }
+      } catch (error) {
+        console.error('Error fetching routes:', error);
+      } finally {
+        setLoadingRoutes(false);
+      }
+    };
+
+    fetchRoutes();
+  }, [dementiaUserId, refreshKey]);
+
   const handleSuccess = () => {
     setRefreshKey((prev) => prev + 1);
+  };
+
+  const toggleRouteActive = async (routeId: string, currentActive: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('safe_routes')
+        .update({ is_active: !currentActive })
+        .eq('id', routeId);
+
+      if (error) throw error;
+      setRefreshKey((prev) => prev + 1);
+    } catch (error) {
+      console.error('Error toggling route:', error);
+    }
   };
 
   if (loading) {
@@ -52,36 +104,6 @@ const CaregiverRoutes = () => {
       </div>
     );
   }
-
-  const routes = [
-    {
-      id: 1,
-      name: "Morning Walk",
-      distance: "0.8 miles",
-      duration: "15-20 min",
-      comfortPoints: 5,
-      stressPoints: 1,
-      status: "active",
-    },
-    {
-      id: 2,
-      name: "Afternoon Stroll",
-      distance: "1.2 miles",
-      duration: "25-30 min",
-      comfortPoints: 8,
-      stressPoints: 2,
-      status: "saved",
-    },
-    {
-      id: 3,
-      name: "Quick Loop",
-      distance: "0.4 miles",
-      duration: "8-10 min",
-      comfortPoints: 3,
-      stressPoints: 0,
-      status: "saved",
-    },
-  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -120,7 +142,12 @@ const CaregiverRoutes = () => {
             <h2 className="text-2xl font-bold text-foreground mb-4">Routes Overview</h2>
             {dementiaUserId ? (
               <div className="rounded-2xl h-[500px] overflow-hidden border-2 border-border">
-                <RoutesMap key={refreshKey} dementiaUserId={dementiaUserId} className="h-full" />
+                <RoutesMap 
+                  key={refreshKey} 
+                  dementiaUserId={dementiaUserId} 
+                  selectedRouteId={selectedRouteId}
+                  className="h-full" 
+                />
               </div>
             ) : (
               <div className="bg-muted/30 rounded-2xl h-[500px] flex items-center justify-center border-2 border-border">
@@ -136,81 +163,99 @@ const CaregiverRoutes = () => {
           </Card>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Route List */}
-          <div className="lg:col-span-2 space-y-6">
-            {routes.map((route) => (
-              <Card key={route.id} className="p-6 rounded-2xl shadow-card hover:shadow-soft transition-all">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-calm flex items-center justify-center">
-                      <Map className="w-6 h-6 text-primary-foreground" />
-                    </div>
+        {/* Routes List */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {loadingRoutes ? (
+            <div className="col-span-full text-center py-12">
+              <p className="text-muted-foreground">Loading routes...</p>
+            </div>
+          ) : routes.length === 0 ? (
+            <div className="col-span-full text-center py-12">
+              <Map className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">No routes created yet</p>
+              <p className="text-sm text-muted-foreground mt-2">Click "Create New Route" to get started</p>
+            </div>
+          ) : (
+            routes.map((route) => {
+              const distanceKm = route.distance_meters ? (route.distance_meters / 1000).toFixed(2) : 'N/A';
+              const distanceMiles = route.distance_meters ? (route.distance_meters / 1609.34).toFixed(2) : 'N/A';
+              const duration = route.estimated_duration_minutes || 'N/A';
+              const isSelected = selectedRouteId === route.id;
+
+              return (
+                <Card 
+                  key={route.id} 
+                  className={`p-6 rounded-2xl shadow-card hover:shadow-lg transition-all cursor-pointer ${
+                    isSelected ? 'ring-2 ring-primary' : ''
+                  }`}
+                  onClick={() => setSelectedRouteId(isSelected ? null : route.id)}
+                >
+                  <div className="flex justify-between items-start mb-4">
                     <div>
                       <h3 className="text-xl font-bold text-foreground">{route.name}</h3>
-                      <div className="flex items-center space-x-4 mt-2 text-muted-foreground">
-                        <span className="flex items-center space-x-1">
-                          <Map className="w-4 h-4" />
-                          <span className="text-sm">{route.distance}</span>
+                      {route.description && (
+                        <p className="text-sm text-muted-foreground mt-1">{route.description}</p>
+                      )}
+                      <div className="flex items-center space-x-3 mt-2 text-sm text-muted-foreground">
+                        <span className="flex items-center">
+                          <Map className="w-4 h-4 mr-1" />
+                          {distanceMiles} mi
                         </span>
-                        <span className="flex items-center space-x-1">
-                          <Clock className="w-4 h-4" />
-                          <span className="text-sm">{route.duration}</span>
+                        <span className="flex items-center">
+                          <Clock className="w-4 h-4 mr-1" />
+                          {duration} min
                         </span>
                       </div>
                     </div>
-                  </div>
-                  <Badge
-                    className={`rounded-full px-4 py-1 ${
-                      route.status === "active"
-                        ? "bg-comfort text-comfort-foreground"
-                        : "bg-muted text-muted-foreground"
-                    }`}
-                  >
-                    {route.status === "active" ? "Active Now" : "Saved"}
-                  </Badge>
-                </div>
-
-                {/* Mock Map Preview */}
-                <div className="bg-muted/30 rounded-xl h-48 mb-4 flex items-center justify-center border border-border">
-                  <p className="text-muted-foreground">Route map preview</p>
-                </div>
-
-                {/* Route Stats */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-6">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 rounded-full bg-comfort"></div>
-                      <span className="text-sm text-muted-foreground">
-                        {route.comfortPoints} Comfort Points
-                      </span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 rounded-full bg-stress"></div>
-                      <span className="text-sm text-muted-foreground">
-                        {route.stressPoints} Stress Points
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm" className="rounded-lg">
-                      Edit
-                    </Button>
-                    <Button
-                      size="sm"
-                      className="rounded-lg bg-gradient-calm text-primary-foreground hover:opacity-90"
+                    <Badge
+                      className={
+                        route.is_active
+                          ? "bg-success text-success-foreground"
+                          : "bg-muted text-muted-foreground"
+                      }
                     >
-                      {route.status === "active" ? "Active" : "Activate"}
+                      {route.is_active ? (
+                        <>
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                          Active
+                        </>
+                      ) : (
+                        "Saved"
+                      )}
+                    </Badge>
+                  </div>
+
+                  <div className="flex space-x-2 mt-4">
+                    <Button 
+                      variant={isSelected ? "default" : "outline"} 
+                      className="flex-1 rounded-xl"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedRouteId(isSelected ? null : route.id);
+                      }}
+                    >
+                      {isSelected ? 'Hide' : 'Preview'}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="flex-1 rounded-xl"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleRouteActive(route.id, route.is_active || false);
+                      }}
+                    >
+                      {route.is_active ? 'Deactivate' : 'Activate'}
                     </Button>
                   </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+                </Card>
+              );
+            })
+          )}
+        </div>
 
-          {/* Right Sidebar */}
-          <div className="space-y-6">
-            {/* Create Route Guide */}
+        {/* Right Sidebar */}
+        <div className="mt-8 max-w-md">
+          {/* Route Tips */}
             <Card className="p-6 rounded-2xl shadow-card">
               <h3 className="text-lg font-bold text-foreground mb-4">
                 Creating a Safe Route
@@ -244,7 +289,6 @@ const CaregiverRoutes = () => {
               </p>
             </Card>
           </div>
-        </div>
       </main>
 
       {dementiaUserId && user && (
