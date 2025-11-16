@@ -45,7 +45,7 @@ const Auth = () => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session) {
-        navigate("/");
+        navigate("/select-mode");
       }
     });
 
@@ -54,7 +54,7 @@ const Auth = () => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session) {
-        navigate("/");
+        navigate("/select-mode");
       }
     });
 
@@ -90,7 +90,7 @@ const Auth = () => {
         email: validation.data.email,
         password: validation.data.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          emailRedirectTo: `${window.location.origin}/select-mode`,
           data: {
             display_name: validation.data.displayName,
             user_type: userType,
