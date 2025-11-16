@@ -93,6 +93,32 @@ const ComfortMap = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">
+        {/* No Patient Warning */}
+        {!dementiaUserId && (
+          <Card className="mb-8 p-8 rounded-2xl shadow-card border-2 border-amber-500/50 bg-amber-500/5">
+            <div className="flex items-start space-x-4">
+              <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+                <MapPin className="w-6 h-6 text-amber-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-foreground mb-2">No Patient Connected</h3>
+                <p className="text-muted-foreground mb-4">
+                  To mark comfort and stress points, you need to establish a caregiving relationship with a dementia user first. 
+                  These emotional landmarks help create better navigation routes for your patient.
+                </p>
+                <div className="bg-card/50 rounded-xl p-4 border border-border">
+                  <p className="text-sm font-semibold text-foreground mb-2">How to connect with a patient:</p>
+                  <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
+                    <li>Have the dementia user create an account</li>
+                    <li>They will share their User ID with you</li>
+                    <li>You can then establish a caregiving relationship</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
+
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Map View */}
           <div className="lg:col-span-2">
@@ -119,12 +145,14 @@ const ComfortMap = () => {
                   />
                 </div>
               ) : (
-                <div className="bg-muted/30 rounded-2xl h-[600px] flex items-center justify-center border-2 border-border">
-                  <div className="text-center space-y-2">
-                    <MapPin className="w-16 h-16 text-primary mx-auto" />
-                    <p className="text-muted-foreground">No patient assigned</p>
-                    <p className="text-sm text-muted-foreground">
-                      Connect with a dementia user to manage comfort points
+                <div className="bg-muted/30 rounded-2xl h-[600px] flex items-center justify-center border-2 border-dashed border-border">
+                  <div className="text-center space-y-3">
+                    <div className="w-20 h-20 rounded-full bg-muted mx-auto flex items-center justify-center">
+                      <MapPin className="w-10 h-10 text-muted-foreground" />
+                    </div>
+                    <p className="text-lg font-semibold text-foreground">Map Unavailable</p>
+                    <p className="text-sm text-muted-foreground max-w-xs mx-auto">
+                      Connect with a patient to mark comfort and stress points
                     </p>
                   </div>
                 </div>
